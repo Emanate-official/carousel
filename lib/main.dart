@@ -1,7 +1,6 @@
 import 'package:carousel/carousel.dart';
 import 'package:flutter/material.dart';
-import 'package:refresh_list/loading_list.dart';
-import 'dart:math' as math;
+import 'package:refresh_list/sliver_list.dart';
 
 void main() {
   runApp(const App());
@@ -30,6 +29,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int length = 15;
   List<String> images = [
     "https://wallpaperaccess.com/full/2637581.jpg",
     "https://wallpaperaccess.com/full/2637581.jpg",
@@ -43,102 +43,100 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).viewPadding.top,
         ),
-        child: CustomScrollView(
-          physics: const ClampingScrollPhysics(),
-          slivers: <Widget>[
-            SliverAppBar(
-              snap: false,
-              floating: false,
-              expandedHeight: 150,
-              flexibleSpace: Carousel(
-                children: List.generate(
-                  images.length,
-                  (int index) {
-                    return Container(
-                      margin: const EdgeInsets.all(0),
-                      child: Image.network(
-                        images[index],
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            SliverFillRemaining(
-              child: RefreshList(
-                builder: (int index) {
-                  return Container(
-                    margin: const EdgeInsets.all(2),
-                    height: 100,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.red,
-                  );
-                },
-                physics: CustomScrollPhysics(),
-                length: 32,
+        child: Column(
+          children: [
+            Expanded(
+              child: SliverLoadingList(
+                loadingIndicatorOffset: 255,
                 loadingIndicator: SizedBox(
                   height: 100,
                   width: MediaQuery.of(context).size.width,
+                  child: Container(
+                    height: 100,
+                    width: MediaQuery.of(context).size.width,
+                    margin: const EdgeInsets.all(2),
+                    color: Colors.blue,
+                  ),
                 ),
-                onLoad: () async {},
-                onRefresh: () async {},
+                onLoad: () async {
+                  await Future.delayed(const Duration(seconds: 3));
+                  setState(() {
+                    length += 5;
+                  });
+                },
+                onRefresh: () async {
+                  setState(() {
+                    length = 0;
+                  });
+                  Future.delayed(const Duration(seconds: 5), () async {
+                    setState(() {
+                      length = 10;
+                    });
+                  });
+                },
+                sliverBars: [
+                  SliverAppBar(
+                    backgroundColor: Colors.transparent,
+                    snap: false,
+                    floating: false,
+                    expandedHeight: 150,
+                    flexibleSpace: Carousel(
+                      children: List.generate(
+                        images.length,
+                        (int index) {
+                          return Container(
+                            margin: const EdgeInsets.all(0),
+                            child: Image.network(
+                              images[index],
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SliverAppBar(
+                    backgroundColor: Colors.transparent,
+                    pinned: true,
+                    primary: false,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          height: 50,
+                          width: 100,
+                          color: Colors.green,
+                        ),
+                        Container(
+                          height: 50,
+                          width: 100,
+                          color: Colors.green,
+                        ),
+                        Container(
+                          height: 50,
+                          width: 100,
+                          color: Colors.green,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                length: length,
+                builder: (int index) {
+                  return SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      height: 100,
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.red,
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class CustomScrollPhysics extends ScrollPhysics {
-  CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
-
-  bool isScrollingUp = false;
-
-  @override
-  bool shouldAcceptUserOffset(ScrollMetrics position) {
-    if (position.viewportDimension == 797) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // @override
-  // bool get allowImplicitScrolling => false;
-
-  @override
-  CustomScrollPhysics applyTo(ancestor) {
-    return CustomScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
-    isScrollingUp = offset.sign < 0;
-    return offset;
-  }
-
-  @override
-  double applyBoundaryConditions(ScrollMetrics position, double value) {
-    if (value < position.pixels &&
-        position.pixels <= position.minScrollExtent) {
-      return value - position.pixels;
-    }
-    if (position.maxScrollExtent <= position.pixels &&
-        position.pixels < value) {
-      return value - position.pixels;
-    }
-    if (value < position.minScrollExtent &&
-        position.minScrollExtent < position.pixels) {
-      return value - position.minScrollExtent;
-    }
-
-    if (position.pixels < position.maxScrollExtent &&
-        position.maxScrollExtent < value) {
-      return value - position.maxScrollExtent;
-    }
-    return 0.0;
   }
 }
