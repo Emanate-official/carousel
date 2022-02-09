@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  refresh_list:
-    git: https://github.com/Flutter-Postal-Service/refresh-list.git
 
 dev_dependencies:
   flutter_test:

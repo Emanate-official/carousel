@@ -1,3 +1,5 @@
+library carousel;
+
 import 'package:flutter/material.dart';
 
 class Carousel extends StatefulWidget {
@@ -7,6 +9,7 @@ class Carousel extends StatefulWidget {
     this.initialPage = 0,
     this.onPageChange,
     this.padEnds = false,
+    this.pageController,
     this.pageSnapping = true,
     this.viewportFraction = .95,
   }) : super(key: key);
@@ -23,6 +26,9 @@ class Carousel extends StatefulWidget {
   /// Add additional padding to the ends of the carousel
   final bool padEnds;
 
+  /// Controller to manage navigation
+  final PageController? pageController;
+
   /// Snap to page when swipping
   final bool pageSnapping;
 
@@ -38,10 +44,13 @@ class _CarouselState extends State<Carousel> {
 
   @override
   void initState() {
-    _controller = PageController(
-      initialPage: widget.initialPage,
-      viewportFraction: widget.viewportFraction,
-    );
+    // Create a new page controller if one is not provided
+    _controller = widget.pageController ??
+        PageController(
+          initialPage: widget.initialPage,
+          viewportFraction: widget.viewportFraction,
+        );
+
     super.initState();
   }
 

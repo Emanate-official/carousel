@@ -102,15 +102,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
-  refresh_list:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: fcd7d0aa24b95aa977718323e88b36d75fd64370
-      url: "https://github.com/Flutter-Postal-Service/refresh-list.git"
-    source: git
-    version: "0.0.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -174,4 +165,3 @@ packages:
     version: "2.1.1"
 sdks:
   dart: ">=2.15.1 <3.0.0"
-  flutter: ">=1.17.0"
